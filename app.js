@@ -15,8 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
 MongoClient.connect(process.env.DATABASE_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+ 
 }).then((client) => {
   console.log('Connected to MongoDB');
  

@@ -1,22 +1,19 @@
 const { ObjectId } = require("mongodb");
-const collection = require("../../config/mongodb").db.collection("Users");
-const { v4: uuidv4 } = require("uuid");
+const User = require("../models/User.js");
 
-module.exports = {
-  getAllUsers: async (req, res) => {
+class UsersController {
+  async getAllUsers(req, res) {
     try {
-      const users = await collection.find().toArray();
+      const users = await User.getUsers();
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  },
+  }
 
-  getUserById: async (req, res) => {
+  async getUserById(req, res) {
     try {
-      const user = await collection.findOne({
-        _id: new ObjectId(req.params.id),
-      });
+      const user = await User.getUserById(req.params.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -24,10 +21,10 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  },
+  }
 
-  createUser: async (req, res) => {
-    const existingUser = await collection.findOne({ email: req.body.email });
+  async createUser(req, res) {
+    const existingUser = await User.getUserByEmail(req.body.email);
     if (existingUser) {
       return res.status(409).json({ message: "Email already exists" });
     }
@@ -37,23 +34,18 @@ module.exports = {
     if (!name || !email || typeof age !== "number") {
       return res.status(400).json({ message: "Invalid input data" });
     }
-
-    const id = uuidv4();
-
     try {
-      const newUser = { id, name, email, age };
-
-      const result = await collection.insertOne(newUser);
+      const newUser = await User.createUser({ name, email, age });
 
       res.status(201).json({
-        message: `Added user ${name} with ID and UUID ${id} successfully`,
+        message: `Added user ${newUser.name} with ID and UUID ${newUser.id} successfully`,
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  },
+  }
 
-  updateUser: async (req, res) => {
+  async updateUser(req, res) {
     const { name, email, age } = req.body;
 
     if (!name || !email || typeof age !== "number") {
@@ -61,30 +53,29 @@ module.exports = {
     }
 
     try {
-      const updatedUser = { name, email, age };
-      const result = await collection.findOneAndUpdate(
-        { _id: new ObjectId(req.params.id) },
-        { $set: updatedUser },
-        { returnOriginal: false }
-      );
+      const result = await User.updateUser(req.params.id, {
+        name,
+        email,
+        age,
+      });
 
       if (!result) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      res
-        .status(200)
-        .json({ massage: `update user whith ID ${result._id} seccessful` });
+      res.status(200).json({
+        message: `Update user with ID ${result._id} successful`,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  },
+  }
 
-  deleteUser: async (req, res) => {
+  async deleteUser(req, res) {
     const User_id = req.params.id;
     try {
-      const result = await collection.deleteOne({ _id: new ObjectId(User_id) });
-      if (result.deletedCount === 0) {
+      const result = await User.deleteUser(User_id);
+      if (!result) {
         return res.status(404).json({ message: "User not found" });
       }
       res
@@ -93,5 +84,7 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  },
-};
+  }
+}
+
+module.exports = new UsersController();
