@@ -2,7 +2,7 @@ const express = require('express');
 const { MongoClient } = require('mongodb'); // Changed from 'mongoose' to 'mongodb'
 const dotenv = require('dotenv');
 const router = require('./user_crud_api/routes/User');
-
+const logger = require('./middleware/logger');
 dotenv.config();
 
 const app = express();
@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(logger);
 
 MongoClient.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
