@@ -5,10 +5,10 @@ const { validateUser } = require("../../middleware/validate.js");
 
 const router = express.Router();
 router.get("/users", UsersController.getAllUsers);
+router.post("/users", validateUser, UsersController.createUser);
 
 router.get("/users/:id", UsersController.getUserById);
 
-router.post("/users", validateUser, UsersController.createUser);
 
 router.put("/users/:id", validateUser, UsersController.updateUser);
 

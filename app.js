@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient } = require('mongodb'); // Changed from 'mongoose' to 'mongodb'
+const { MongoClient } = require('mongodb'); 
 const dotenv = require('dotenv');
 const router = require('./user_crud_api/routes/User');
 const logger = require('./middleware/logger');
@@ -27,3 +27,5 @@ MongoClient.connect(process.env.DATABASE_URL, {
 }).catch((err) => {
   console.error('Failed to connect to MongoDB', err);
 });
+
+module.exports = app;

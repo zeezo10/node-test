@@ -1,7 +1,8 @@
 const { ObjectId } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 
-const collection = require("../../config/mongodb").db.collection("Users");
+const collection = require("../../config/mongodb_Test").db.collection("users");
+// const collection = require("../../config/mongodb").db.collection("Users");
 
 class User {
   static async getUsers() {
@@ -16,7 +17,7 @@ class User {
 
   static async getUserById(id) {
     const result = await collection.findOne({
-      _id: new ObjectId(id),
+      id:(id),
     });
     return result;
   }
@@ -40,15 +41,15 @@ class User {
       age: userData.age,
     };
     const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
+      { id: (id) },
       { $set: updatedUser },
-      { returnOriginal: false }
+      { returnOriginal: false, returnDocument: "after" }
     );
     return result;
   }
 
   static async deleteUser(userId) {
-    const result = await collection.deleteOne({ _id: new ObjectId(userId) });
+    const result = await collection.deleteOne({ id:(userId) });
     return result.deletedCount > 0;
   }
 }

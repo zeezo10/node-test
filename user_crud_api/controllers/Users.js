@@ -7,7 +7,8 @@ class UsersController {
       const users = await User.getUsers();
       res.status(200).json(users);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Internal Server Error" });
     }
   }
 
@@ -19,7 +20,9 @@ class UsersController {
       }
       res.status(200).json(user);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      if (error) {
+        res.status(500).json({ message: error.message });
+      }
     }
   }
 
@@ -37,9 +40,7 @@ class UsersController {
     try {
       const newUser = await User.createUser({ name, email, age });
 
-      res.status(201).json({
-        message: `Added user ${newUser.name} with ID and UUID ${newUser.id} successfully`,
-      });
+      res.status(201).json(newUser);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -63,9 +64,7 @@ class UsersController {
         return res.status(404).json({ message: "User not found" });
       }
 
-      res.status(200).json({
-        message: `Update user with ID ${result._id} successful`,
-      });
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -78,9 +77,7 @@ class UsersController {
       if (!result) {
         return res.status(404).json({ message: "User not found" });
       }
-      res
-        .status(200)
-        .json({ message: `User with ID ${User_id} deleted successfully` });
+      res.status(200).json({ message: `User deleted successfully` });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
