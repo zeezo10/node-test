@@ -65,7 +65,7 @@ npm start
 The API validates:
 
 - Name (required, must be a string)
-- Email (required, must be a valid email format, uniq)
+- Email (required, must be a valid email format, unique)
 - Age (required, must be a number)
 
 ## Error Handling

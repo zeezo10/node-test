@@ -18,13 +18,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
 
-connectToDB()
+if (process.env.NODE_ENV !== 'test') {
+  connectToDB();
+}
 
 app.use(router);
 
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT} ENV:${process.env.NODE_ENV}`);
 });
 
 module.exports = app;

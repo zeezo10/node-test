@@ -7,7 +7,7 @@ let db;
 let testUserId;
 
 beforeAll(async () => {
-  await mongoose.connect(process.env.DATABASE_URL, {
+  await mongoose.connect(global.__MONGO_URI__, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
@@ -16,8 +16,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.dropDatabase();
-  await mongoose.disconnect();
+  await mongoose.connection.close();
 });
 
 describe("User API", () => {
