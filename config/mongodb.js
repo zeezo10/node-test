@@ -1,19 +1,17 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+
 require("dotenv").config();
-const uri = process.env.DATABASE_URL;
 
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true ,
-    deprecationErrors: true,
-  },
-});
+const mongoose = require("mongoose");
 
-const dbName = "node_test";
-
-const db = client.db(dbName);
-
-module.exports = {
-  db
+const connectToDB = async () => {
+  await mongoose
+    .connect(process.env.DATABASE_URL, {})
+    .then((client) => {
+      console.log("Connected to MongoDB");
+    })
+    .catch((err) => {
+      console.error("Failed to connect to MongoDB", err);
+    });
 };
+
+module.exports = connectToDB;

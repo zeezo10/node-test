@@ -1,20 +1,22 @@
-const { ObjectId } = require("mongodb");
-const User = require("../models/User.js");
+const User = require("../models/User.model.js");
+const { v4: uuidv4 } = require("uuid");
 
 class UsersController {
   async getAllUsers(req, res) {
     try {
-      const users = await User.getUsers();
+      const users = await User.find();
       res.status(200).json(users);
     } catch (error) {
-      console.error("Error fetching users:", error);
       res.status(500).json({ message: "Internal Server Error" });
     }
   }
 
   async getUserById(req, res) {
+    const id = req.params.id;
     try {
-      const user = await User.getUserById(req.params.id);
+      const user = await User.findOne({
+        id: id,
+      });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -27,18 +29,16 @@ class UsersController {
   }
 
   async createUser(req, res) {
-    const existingUser = await User.getUserByEmail(req.body.email);
+    const { name, email, age } = req.body;
+
+    const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       return res.status(409).json({ message: "Email already exists" });
     }
 
-    const { name, email, age } = req.body;
-
-    if (!name || !email || typeof age !== "number") {
-      return res.status(400).json({ message: "Invalid input data" });
-    }
     try {
-      const newUser = await User.createUser({ name, email, age });
+      const newUser = await User.create({ id: uuidv4(), name, email, age });
 
       res.status(201).json(newUser);
     } catch (error) {
@@ -48,17 +48,20 @@ class UsersController {
 
   async updateUser(req, res) {
     const { name, email, age } = req.body;
+    const id = req.params.id;
 
-    if (!name || !email || typeof age !== "number") {
-      return res.status(400).json({ message: "Invalid input data" });
-    }
+    const updatedUser = {
+      name:name,
+      email:email,
+      age:age,
+    };
 
     try {
-      const result = await User.updateUser(req.params.id, {
-        name,
-        email,
-        age,
-      });
+      const result = await User.findOneAndUpdate(
+        { id: id },
+        { $set: updatedUser },
+        { returnOriginal: false, returnDocument: "after" }
+      );
 
       if (!result) {
         return res.status(404).json({ message: "User not found" });
@@ -71,10 +74,11 @@ class UsersController {
   }
 
   async deleteUser(req, res) {
-    const User_id = req.params.id;
+    const id = req.params.id;
     try {
-      const result = await User.deleteUser(User_id);
-      if (!result) {
+      const result = await User.deleteOne({ id: id });
+      
+      if (result.deletedCount === 0) {
         return res.status(404).json({ message: "User not found" });
       }
       res.status(200).json({ message: `User deleted successfully` });
