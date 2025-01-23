@@ -22,9 +22,9 @@ class UsersController {
       }
       res.status(200).json(user);
     } catch (error) {
-      if (error) {
+      
         res.status(500).json({ message: error.message });
-      }
+     
     }
   }
 
