@@ -28,6 +28,7 @@ npm install
 ```
 DATABASE_URL=<your-mongodb-connection-string>
 PORT=3000
+NODE_ENV=development
 ```
 
 ## Running the Application
